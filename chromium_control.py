@@ -31,7 +31,7 @@ class chrome:
 
         #filter out child targets
         for tab in tabs:
-            if 'parentId' not in list(tab):
+            if 'parentId' not in list(tab) and tab['type'] == 'page':
                 filtered_tabs.append(tab)
         return filtered_tabs
 
