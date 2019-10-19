@@ -21,6 +21,10 @@ class chrome:
     def get_tabs(self):
         """
         Get list over tabs.
+
+        Order is well-defined, first position corresponds to currently selected
+        tab, while last position corresponds to the tab underneath all the
+        other tabs after user selection.
         """
         tabs = requests.get(API_URL).json()
         filtered_tabs = []
