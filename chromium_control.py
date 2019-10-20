@@ -1,22 +1,26 @@
 import requests
 import numpy as np
 
-API_URL = "http://localhost:9222/json"
-
 class chrome:
     """
     Control chrome session through its remote interface.  Start chromium by
     e.g. chromium --remote-debugging-port=9222 to enable remote control.
     """
 
-    def __init__(self, api_url=API_URL):
-        self.api_url = api_url
+    def __init__(self, host, port):
+        self.api_url = 'http://' + host + ':' + port + '/json'
 
     def new_tab(self, url):
         """
         Open new tab.
         """
         requests.post(self.api_url + '/new?' + url)
+
+    def close_tab(self, tabid):
+        """
+        Close tab.
+        """
+        requests.post(self.api_url + '/close/' + tabid)
 
     def get_tabs(self):
         """
@@ -26,7 +30,7 @@ class chrome:
         tab, while last position corresponds to the tab underneath all the
         other tabs after user selection.
         """
-        tabs = requests.get(API_URL).json()
+        tabs = requests.get(self.api_url).json()
         filtered_tabs = []
 
         #filter out child targets
@@ -66,13 +70,16 @@ import time
 if __name__ == "__main__":
 
     #arguments
-    parser = argparse.ArgumentParser(description='Control chromium session started with --remote-debugging-port=9222.')
-    parser.add_argument('command', choices=['cycle_forever', 'next_tab'])
-    parser.add_argument('--cycle-time', default=1.0, help='Cycle time.', type=float)
+    parser = argparse.ArgumentParser(description='Control chromium session started with --remote-debugging-port=PORT.')
+    parser.add_argument('command', choices=['cycle_forever', 'next_tab', 'new_tab', 'close_current'])
+    parser.add_argument('--cycle-time', default=1.0, help='Cycle time, for cycle_forever option.', type=float)
+    parser.add_argument('--url', help='URL to open for command new_tab', default='http://google.com')
+    parser.add_argument('--host', default='localhost')
+    parser.add_argument('--port', default='9222', help='Chrome debugging port')
     args = parser.parse_args()
 
     #interface against chrome
-    ctrl = chrome()
+    ctrl = chrome(host=args.host, port=args.port)
 
     if args.command == 'cycle_forever':
         #cycle through all tabs forever
@@ -82,3 +89,9 @@ if __name__ == "__main__":
     elif args.command == 'next_tab':
         #select next tab
         ctrl.next_tab()
+    elif args.command == 'new_tab':
+        #open new tab
+        ctrl.new_tab(args.url)
+    elif args.command == 'close_current':
+        #close currently open tab
+        ctrl.close_tab(ctrl.current_tab())
