@@ -70,8 +70,9 @@ import time
 if __name__ == "__main__":
 
     #arguments
-    parser = argparse.ArgumentParser(description='Control chromium session started with --remote-debugging-port=PORT.')
-    parser.add_argument('command', choices=['cycle_forever', 'next_tab', 'new_tab', 'close_current'])
+    parser = argparse.ArgumentParser(description='Control chromium session started with --remote-debugging-port=PORT.\nExample: python3 chromium_control.py next_tab.', formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('command', choices=['cycle_forever', 'next_tab', 'new_tab', 'close_current'],
+                        help="cycle_forever: Cycle through tabs. Set --cycle-time to change how long each tab\nshould be viewed.\n\nnext_tab: Select next tab.\n\nnew_tab: Open new tab. URL is set using --url.\n\nclose_current: Close currently activated tab.")
     parser.add_argument('--cycle-time', default=1.0, help='Cycle time, for cycle_forever option.', type=float)
     parser.add_argument('--url', help='URL to open for command new_tab', default='http://google.com')
     parser.add_argument('--host', default='localhost')
